@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowDown, ArrowUpRight, Menu, X, Play, Pause } from 'lucide-react';
+import LayoutStudio from './LayoutStudio.jsx';
 import './styles.css';
 
 const scene = 'https://cdn.sceneai.art/';
@@ -18,7 +19,7 @@ const homes = [
   { name: 'The Pavilion', type: '02 / Open-plan living', image: scene + 'Bg%20images/bf2e3004-db02-48a1-8e15-c6a58c158b5c.png', detail: 'A contemporary retreat inspired by long sightlines and simple forms. Generous openings connect the social spaces while sheltered corners offer room to slow down.' },
   { name: 'The Garden Residence', type: '03 / A quieter retreat', image: scene + 'Bg%20images/dce07180-2db9-45fe-889a-7a11657c6234.png', detail: 'A home concept shaped by the landscape around it. Green views, natural textures, and soft light carry a sense of calm from the garden into the interior.' },
 ];
-const nav = [['Residences', '#residences'], ['Design approach', '#approach'], ['Films', '#films']];
+const nav = [['Residences', '#residences'], ['Design approach', '#approach'], ['Layout studio', '#studio'], ['Films', '#films']];
 
 function Brand() {
   return <a className="brand" href="#top" aria-label="BAOSAT Housing home">
@@ -121,6 +122,17 @@ function Approach() {
         </dl>
       </Reveal>
     </div>
+    <div className="wrap approach-ideas">
+      <Reveal className="approach-ideas-intro">
+        <div><p className="eyebrow"><span /> DESIGN DIRECTIONS</p><h3>Start with how you live.</h3></div>
+        <a className="button button-light" href="#studio">Try the layout studio <ArrowUpRight size={18}/></a>
+      </Reveal>
+      <Reveal className="approach-directions">
+        <article><img src={interior} alt="" loading="lazy" decoding="async"/><div><small>01 / OPEN PLAN</small><h4>Connected living</h4><p>Group the kitchen, dining, and living areas for easy conversation and flexible gatherings.</p></div></article>
+        <article><img src={living} alt="" loading="lazy" decoding="async"/><div><small>02 / PRIVATE RETREAT</small><h4>Room for quiet</h4><p>Keep bedrooms and reading corners away from the busiest rooms so different routines can coexist.</p></div></article>
+        <article><img src={exterior} alt="" loading="lazy" decoding="async"/><div><small>03 / INDOOR–OUTDOOR</small><h4>Living beyond walls</h4><p>Place a terrace beside the living area to extend where you eat, unwind, or entertain.</p></div></article>
+      </Reveal>
+    </div>
   </section>;
 }
 
@@ -144,9 +156,9 @@ function Film({ film }) {
 function App() {
   return <>
     <a className="skip-link" href="#residences">Skip to residences</a>
-    <main><Hero /><Collection /><Approach />
+    <main><Hero /><Collection /><Approach /><LayoutStudio />
       <section className="films wrap" id="films" aria-labelledby="films-title">
-        <Reveal className="section-intro"><div><p className="eyebrow"><span /> 03 / IN MOTION</p><h2 id="films-title">Spaces in motion.</h2></div><p>See how light, texture, and perspective change as you move through a home.</p></Reveal>
+        <Reveal className="section-intro"><div><p className="eyebrow"><span /> 04 / IN MOTION</p><h2 id="films-title">Spaces in motion.</h2></div><p>See how light, texture, and perspective change as you move through a home.</p></Reveal>
         <Reveal className="film-grid">{films.map(film => <Film key={film.title} film={film} />)}</Reveal>
       </section>
     </main>
