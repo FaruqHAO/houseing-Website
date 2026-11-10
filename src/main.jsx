@@ -1,234 +1,157 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowUpRight, House, Menu, X } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Menu, X, Play, Pause } from 'lucide-react';
 import './styles.css';
 
-const base = 'https://cdn.sceneai.art/';
-const heroImage = base + 'Bg%20images/1dd58514-cedb-4f70-9aee-709c3f887808.png';
-const videoSource = base + 'Hero%20Section%20Video/adec243d-ffda-48cf-a8a8-26e6d6bcbe9b.mp4';
-const houses = [
-  'c789ac4d-f2c8-463a-93f6-1f8c6fa09f9a',
-  'bf2e3004-db02-48a1-8e15-c6a58c158b5c',
-  'dce07180-2db9-45fe-889a-7a11657c6234',
+const scene = 'https://cdn.sceneai.art/';
+const photo = (id, width) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=82`;
+const exterior = photo('photo-1600596542815-ffad4c1539a9', 1800);
+const interior = photo('photo-1600607687939-ce8a6c25118c', 1600);
+const living = photo('photo-1600210492486-724fe5c67fb0', 1200);
+const films = [
+  { title: 'A closer look', detail: 'Exterior walkthrough', poster: exterior, src: scene + 'Hero%20Section%20Video/adec243d-ffda-48cf-a8a8-26e6d6bcbe9b.mp4' },
+  { title: 'The light within', detail: 'Interior study', poster: interior, src: import.meta.env.BASE_URL + 'media/the-light-within.mp4' },
+  { title: 'Room to gather', detail: 'Living room study', poster: living, src: import.meta.env.BASE_URL + 'media/room-to-gather.mp4' },
 ];
-
-function Words({ lines, start = 0, step = .06, duration = .7 }) {
-  let index = 0;
-  return lines.map(line => (
-    <span className="word-line" key={line} aria-hidden="true">
-      {line.split(' ').map((word, position) => (
-        <React.Fragment key={position}>
-          {position > 0 && ' '}
-          <span className="word" style={{ '--delay': `${start + index++ * step}s`, '--duration': `${duration}s` }}>{word}</span>
-        </React.Fragment>
-      ))}
-    </span>
-  ));
-}
-
-const navigation = [
-  ['HOME', '#home', .2], ['PROPERTIES', '#properties', .28],
-  ['AGENT', '#agent', .36], ['PARTNER', '#partner', .44],
+const homes = [
+  { name: 'The Courtyard House', type: '01 / Indoor–outdoor living', image: scene + 'Bg%20images/c789ac4d-f2c8-463a-93f6-1f8c6fa09f9a.png', detail: 'A design study organized around a private outdoor room. The courtyard draws daylight into the plan and gives the living spaces an intimate place to open out.' },
+  { name: 'The Pavilion', type: '02 / Open-plan living', image: scene + 'Bg%20images/bf2e3004-db02-48a1-8e15-c6a58c158b5c.png', detail: 'A contemporary retreat inspired by long sightlines and simple forms. Generous openings connect the social spaces while sheltered corners offer room to slow down.' },
+  { name: 'The Garden Residence', type: '03 / A quieter retreat', image: scene + 'Bg%20images/dce07180-2db9-45fe-889a-7a11657c6234.png', detail: 'A home concept shaped by the landscape around it. Green views, natural textures, and soft light carry a sense of calm from the garden into the interior.' },
 ];
+const nav = [['Residences', '#residences'], ['Design approach', '#approach'], ['Films', '#films']];
 
-function NavLinks({ onNavigate, showInfo }) {
-  return navigation.map(([label, href, delay], index) => (
-    <a key={label} className={index === 0 ? 'pill home' : 'pill glass'} href={href}
-      style={{ '--delay': `${delay}s` }} aria-current={index === 0 ? 'page' : undefined}
-      onClick={event => {
-        onNavigate?.();
-        if (index > 1) {
-          event.preventDefault();
-          showInfo(label);
-        }
-      }}>
-      {index === 0 && <House size={15} aria-hidden="true" />}{label}
-    </a>
-  ));
+function Brand() {
+  return <a className="brand" href="#top" aria-label="BAOSAT Housing home">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M3 28V14L13 5l10 9v14H3Zm10 0V14L23 5l8 7v16h-8" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round"/></svg>
+    <span>BAOSAT<small>HOUSING</small></span>
+  </a>;
 }
 
 function Header() {
-  const [language, setLanguage] = useState('EN');
   const [open, setOpen] = useState(false);
-  const [info, setInfo] = useState('');
-  const menuButton = useRef(null);
-  const dialog = useRef(null);
-
-  function showInfo(label) {
-    setInfo(label);
-    dialog.current.showModal();
-  }
-
-  return (
-    <header className="header" onKeyDown={event => {
-      if (event.key === 'Escape' && open) {
-        setOpen(false);
-        menuButton.current.focus();
-      }
-    }}>
-      <a className="logo nav-in" href="#home" aria-label="Sabrina Residences home" style={{ '--delay': '.1s' }}>
-        <svg viewBox="0 0 40 30" width="40" height="30" fill="none" aria-hidden="true">
-          <path d="M2 27V14L15 3l10 8.5M15 27V14L28 3l10 8.5V27H2" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        </svg>
-      </a>
-      <nav className="desktop-nav" aria-label="Main navigation"><NavLinks showInfo={showInfo} /></nav>
-      <div className="header-actions">
-        <div className="language glass nav-in" aria-label="Language preference" role="group" style={{ '--delay': '.52s' }}>
-          {['BA', 'EN'].map(option => (
-            <button key={option} type="button" aria-pressed={language === option} onClick={() => setLanguage(option)}>{option}</button>
-          ))}
-        </div>
-        <button type="button" className="pill sign-in nav-in" style={{ '--delay': '.6s' }} onClick={() => showInfo('SIGN IN')}>SIGN IN</button>
-        <button ref={menuButton} type="button" className="menu glass nav-in" style={{ '--delay': '.65s' }} aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open} aria-controls="mobile-nav" onClick={() => setOpen(value => !value)}>
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-      <nav className="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden={!open}>
-        <NavLinks onNavigate={() => setOpen(false)} showInfo={showInfo} />
-      </nav>
-      <dialog ref={dialog} className="info-dialog" aria-labelledby="dialog-title">
-        <h2 id="dialog-title">{info}</h2>
-        <p>{info === 'SIGN IN' ? 'Online accounts are not available in this preview.' : 'Explore the current collection of Sabrina Residences homes.'}</p>
-        <form method="dialog"><button className="pill" type="submit">Close</button></form>
-      </dialog>
-    </header>
-  );
+  const toggle = useRef(null);
+  return <header className="site-header wrap" onKeyDown={event => {
+    if (event.key === 'Escape' && open) {
+      setOpen(false);
+      toggle.current.focus();
+    }
+  }}>
+    <Brand />
+    <button className="menu" type="button" ref={toggle} aria-expanded={open} aria-controls="site-nav" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(!open)}>
+      {open ? <X /> : <Menu />}
+    </button>
+    <nav id="site-nav" className={open ? 'open' : ''} aria-label="Main navigation">
+      {nav.map(([label, href]) => <a href={href} key={href} onClick={() => setOpen(false)}>{label}</a>)}
+      <a className="header-cta" href="#residences" onClick={() => setOpen(false)}>Explore the collection <ArrowUpRight size={15} /></a>
+    </nav>
+  </header>;
 }
 
-function VideoCard() {
-  const video = useRef(null);
-  const [segment, setSegment] = useState(0);
-  const [paused, setPaused] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
+function Reveal({ children, className = '' }) {
+  const ref = useRef(null);
   useEffect(() => {
-    const media = video.current;
-    if (paused) {
-      media.pause();
-      return;
-    }
-
-    media.muted = true;
-    let pending = false;
-    const resume = async () => {
-      if (pending || (!media.paused && !media.ended && media.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA)) return;
-      pending = true;
-      try {
-        await media.play();
-      } catch {
-        // The next user gesture or timer can retry if autoplay is restricted.
-      } finally {
-        pending = false;
-      }
-    };
-    const update = () => {
-      if (Number.isFinite(media.duration) && media.duration > 0) {
-        setSegment(Math.min(3, Math.floor(media.currentTime / media.duration * 4)));
-      }
-    };
-    const retryEvents = ['pause', 'ended', 'stalled', 'canplay'];
-    retryEvents.forEach(event => media.addEventListener(event, resume));
-    document.addEventListener('visibilitychange', resume);
-    window.addEventListener('pointerup', resume, { once: true });
-    media.addEventListener('timeupdate', update);
-    const timer = window.setInterval(resume, 1000);
-    resume();
-
-    return () => {
-      retryEvents.forEach(event => media.removeEventListener(event, resume));
-      document.removeEventListener('visibilitychange', resume);
-      window.removeEventListener('pointerup', resume);
-      media.removeEventListener('timeupdate', update);
-      window.clearInterval(timer);
-    };
-  }, [paused]);
-
-  function seek(index) {
-    const media = video.current;
-    if (Number.isFinite(media.duration) && media.duration > 0) {
-      media.currentTime = media.duration * index / 4;
-      setSegment(index);
-    }
-  }
-
-  return (
-    <aside className="video-card" aria-label="Featured property video">
-      <div className="video-box">
-        <video ref={video} src={videoSource} autoPlay={!paused} muted loop playsInline preload="metadata" />
-        <button className="video-toggle" type="button" onClick={() => setPaused(value => !value)}>
-          {paused ? 'Play' : 'Pause'}
-        </button>
-      </div>
-      <p className="caption">
-        <span className="sr-only">Find a home that fits your lifestyle</span>
-        <Words lines={['Find a home that fits', 'your lifestyle']} start={2.15} />
-      </p>
-      <div className="video-progress" role="group" aria-label="Video chapters">
-        {[0, 1, 2, 3].map(index => <button key={index} type="button" aria-label={`Jump to video part ${index + 1}`} aria-pressed={segment === index} onClick={() => seek(index)} />)}
-      </div>
-    </aside>
-  );
-}
-
-function LatestHouses() {
-  const section = useRef(null);
-  const [revealed, setRevealed] = useState(false);
-  useEffect(() => {
-    if (!('IntersectionObserver' in window)) {
-      setRevealed(true);
-      return;
-    }
+    const element = ref.current;
+    if (!('IntersectionObserver' in window)) return;
+    element.dataset.reveal = 'pending';
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        setRevealed(true);
+        element.dataset.reveal = 'visible';
         observer.disconnect();
       }
-    }, { threshold: .15 });
-    observer.observe(section.current);
+    }, { threshold: .08 });
+    observer.observe(element);
     return () => observer.disconnect();
   }, []);
+  return <div ref={ref} className={className}>{children}</div>;
+}
 
-  return (
-    <section ref={section} id="properties" className={`latest${revealed ? ' revealed' : ''}`} aria-labelledby="latest-title">
-      <h2 id="latest-title" aria-label="Our Latest Houses"><Words lines={['OUR', 'LATEST', 'Houses']} step={.15} duration={.9} /></h2>
-      <div className="gallery" role="region" aria-label="Latest house photos" tabIndex={0}>
-        {houses.map((id, index) => (
-          <figure className="house-card" key={id} style={{ '--delay': `${.2 + index * .15}s` }}>
-            <img src={base + `Bg%20images/${id}.png`} alt={`Exterior of featured home ${index + 1}`} loading="lazy" decoding="async" />
-          </figure>
-        ))}
+function Hero() {
+  const lines = [['Room', 'to'], ['live', 'well.']];
+  return <section className="hero" id="top" aria-labelledby="hero-title">
+    <img className="hero-image" src={exterior} alt="" fetchPriority="high" />
+    <Header />
+    <div className="wrap hero-content">
+      <p className="eyebrow"><span /> A collection of contemporary homes</p>
+      <h1 id="hero-title" aria-label="Room to live well.">{lines.map((line, row) => <span className="hero-line" key={line[0]} aria-hidden="true">{line.map((word, index) => <span className="hero-word" key={word} style={{ '--order': row * 2 + index }}>{word}{index === 0 ? ' ' : ''}</span>)}</span>)}</h1>
+      <p>Considered architecture, generous light, and spaces that make everyday life feel a little more open.</p>
+      <div className="hero-actions">
+        <a className="button button-light" href="#residences">Discover residences <ArrowUpRight size={18}/></a>
+        <a className="film-link" href="#films"><Play size={17}/> View the films</a>
       </div>
-    </section>
-  );
+    </div>
+    <div className="hero-bottom wrap"><span>BAOSAT HOUSING / RESIDENTIAL COLLECTION</span><a href="#residences" aria-label="Scroll to residences"><ArrowDown size={19}/></a><span>01 — 03 / DESIGN STUDIES</span></div>
+  </section>;
+}
+
+function Collection() {
+  const dialog = useRef(null);
+  const [selected, setSelected] = useState(null);
+  return <section id="residences" className="collection wrap" aria-labelledby="collection-title">
+    <Reveal className="section-intro">
+      <div><p className="eyebrow"><span /> 01 / THE COLLECTION</p><h2 id="collection-title">A place of your own.</h2></div>
+      <p>Three residential concepts, each with a different relationship to light, landscape, and the way we spend time at home.</p>
+    </Reveal>
+    <Reveal className="cards">
+      {homes.map(home => <article className="home-card" key={home.name}>
+        <button type="button" onClick={() => { setSelected(home); dialog.current.showModal(); }} aria-label={`Explore ${home.name}`}>
+          <img src={home.image} alt="" loading="lazy" decoding="async" />
+          <span className="card-content"><span><small>{home.type}</small><strong>{home.name}</strong></span><ArrowUpRight size={20}/></span>
+        </button>
+      </article>)}
+    </Reveal>
+    <dialog ref={dialog} className="home-dialog" aria-labelledby="home-title">
+      {selected && <><img src={selected.image} alt="" /><div><p className="eyebrow">{selected.type}</p><h2 id="home-title">{selected.name}</h2><p>{selected.detail}</p><small>Illustrative design concept.</small></div></>}
+      <form method="dialog"><button type="submit" aria-label="Close residence details"><X size={22}/></button></form>
+    </dialog>
+  </section>;
+}
+
+function Approach() {
+  return <section className="approach" id="approach" aria-labelledby="approach-title">
+    <div className="wrap approach-layout">
+      <Reveal className="approach-image"><img src={living} alt="Warm contemporary living room with natural textures" loading="lazy" decoding="async" /></Reveal>
+      <Reveal className="approach-copy">
+        <p className="eyebrow"><span /> 02 / THE DESIGN APPROACH</p>
+        <h2 id="approach-title">Details you feel every day.</h2>
+        <p>Good design shows up in the morning light, the way rooms connect, and the places you naturally want to sit.</p>
+        <dl>
+          <div><dt>01</dt><dd><strong>Light first</strong><span>Openings and sightlines that bring daylight deeper into the home.</span></dd></div>
+          <div><dt>02</dt><dd><strong>Honest materials</strong><span>Warm timber, quiet stone, and textures that give rooms depth.</span></dd></div>
+          <div><dt>03</dt><dd><strong>Room to gather</strong><span>Shared spaces with a natural flow between indoors and out.</span></dd></div>
+        </dl>
+      </Reveal>
+    </div>
+  </section>;
+}
+
+function Film({ film }) {
+  const media = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
+  return <figure className="film">
+    <div className="film-frame">
+      <video ref={media} poster={film.poster} src={film.src} preload="none" playsInline muted loop
+        aria-label={film.title} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => setFailed(true)} />
+      {!failed && <button type="button" aria-label={`${playing ? 'Pause' : 'Play'} ${film.title}`} onClick={() => {
+        if (media.current.paused) media.current.play().catch(() => setFailed(true));
+        else media.current.pause();
+      }}>{playing ? <Pause size={20}/> : <Play size={20}/>}</button>}
+    </div>
+    <figcaption><strong>{film.title}</strong><span>{failed ? 'Video unavailable' : film.detail}</span></figcaption>
+  </figure>;
 }
 
 function App() {
-  return (
-    <main className="page">
-      <div className="grid-lines" aria-hidden="true">
-        {[4.8, 35.45, 64.7, 95.2].map((left, index) => <i key={left} style={{ left: `${left}%`, '--delay': `${index * .1}s` }} />)}
-      </div>
-      <section className="hero" id="home" aria-labelledby="hero-title">
-        <img className="hero-house" src={heroImage} alt="" fetchPriority="high" />
-        <Header />
-        <div className="hero-copy">
-          <h1 id="hero-title" aria-label="Sabrina Residences House"><Words lines={['SABRINA', 'RESIDENCES', 'HOUSE']} start={.55} step={.2} duration={1} /></h1>
-          <p className="tagline">
-            <span className="sr-only">Trusted real estate experts for a smoother, smarter property journey.</span>
-            <Words lines={['TRUSTED REAL ESTATE', 'EXPERTS FOR A SMOOTHER, SMARTER', 'PROPERTY JOURNEY.']} start={1.15} />
-          </p>
-        </div>
-        <div className="explore-row">
-          <a className="explore" href="#properties" aria-label="Explore properties">
-            <Words lines={['EXPLORE PROPERTIES']} start={1.85} duration={.8} />
-            <ArrowUpRight size={18} className="word" style={{ '--delay': '1.97s', '--duration': '.8s' }} aria-hidden="true" />
-          </a>
-        </div>
-        <VideoCard />
+  return <>
+    <a className="skip-link" href="#residences">Skip to residences</a>
+    <main><Hero /><Collection /><Approach />
+      <section className="films wrap" id="films" aria-labelledby="films-title">
+        <Reveal className="section-intro"><div><p className="eyebrow"><span /> 03 / IN MOTION</p><h2 id="films-title">Spaces in motion.</h2></div><p>See how light, texture, and perspective change as you move through a home.</p></Reveal>
+        <Reveal className="film-grid">{films.map(film => <Film key={film.title} film={film} />)}</Reveal>
       </section>
-      <LatestHouses />
     </main>
-  );
+    <footer className="footer"><div className="wrap footer-inner"><Brand /><p>Contemporary residential design studies.</p><a href="#top">Back to top <ArrowUpRight size={17}/></a></div></footer>
+  </>;
 }
 
 createRoot(document.getElementById('root')).render(<App />);
