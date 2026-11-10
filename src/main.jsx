@@ -66,10 +66,50 @@ function Reveal({ children, className = '' }) {
   return <div ref={ref} className={className}>{children}</div>;
 }
 
+function HeroBackdrop() {
+  const video = useRef(null);
+  const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [started, setStarted] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const change = event => {
+      setReduced(event.matches);
+      setStarted(false);
+      setPlaying(false);
+    };
+    preference.addEventListener('change', change);
+    return () => preference.removeEventListener('change', change);
+  }, []);
+
+  return <>
+    <img className="hero-image" src={exterior} alt="" fetchPriority="high" />
+    {!reduced && <video
+      className={`hero-video${started ? ' visible' : ''}`}
+      ref={video}
+      src={import.meta.env.BASE_URL + 'media/baosat-hero.mp4'}
+      autoPlay muted loop playsInline preload="metadata" aria-hidden="true"
+      onPlaying={() => { setStarted(true); setPlaying(true); }}
+      onPause={() => setPlaying(false)}
+      onError={() => { setStarted(false); setPlaying(false); }}
+    />}
+    {!reduced && started && <button type="button" className="hero-motion"
+      aria-label={playing ? 'Pause background video' : 'Play background video'}
+      onClick={() => {
+        const media = video.current;
+        if (media.paused) media.play().catch(() => setPlaying(false));
+        else media.pause();
+      }}>
+      {playing ? <Pause size={17} aria-hidden="true" /> : <Play size={17} aria-hidden="true" />}
+    </button>}
+  </>;
+}
+
 function Hero() {
   const lines = [['Room', 'to'], ['live', 'well.']];
   return <section className="hero" id="top" aria-labelledby="hero-title">
-    <img className="hero-image" src={exterior} alt="" fetchPriority="high" />
+    <HeroBackdrop />
     <Header />
     <div className="wrap hero-content">
       <p className="eyebrow"><span /> A collection of contemporary homes</p>

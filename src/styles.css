@@ -10,8 +10,11 @@ a:focus-visible,button:focus-visible{outline:2px solid #b58c4f;outline-offset:5p
 .skip-link{position:absolute;z-index:10;top:10px;left:10px;padding:12px 18px;background:var(--sand);transform:translateY(-150%)}
 .skip-link:focus{transform:none}
 .hero{position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:max(700px,min(940px,100svh));color:#fff;background:#262a22;overflow:hidden}
-.hero-image,.hero::after{position:absolute;inset:0;height:100%}
-.hero-image{z-index:-2;object-fit:cover;object-position:58% center;animation:camera 2.4s cubic-bezier(.18,.65,.28,1) both}
+.hero-image,.hero-video,.hero::after{position:absolute;inset:0;height:100%}
+.hero-image,.hero-video{z-index:-2;object-fit:cover;object-position:58% center}
+.hero-video{opacity:0;transition:opacity .35s}
+.hero-video.visible{opacity:1}
+.hero-image{animation:camera 2.4s cubic-bezier(.18,.65,.28,1) both}
 .hero::after{content:"";z-index:-1;background:linear-gradient(90deg,#141b15ed 0%,#141b159f 40%,#141b1522 100%),linear-gradient(180deg,#0d150d66 0%,transparent 28%,transparent 69%,#0d150dbb)}
 @keyframes camera{from{transform:scale(1.065);opacity:.55}to{transform:scale(1);opacity:1}}
 .site-header{position:relative;z-index:2;min-height:88px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff40}
@@ -44,6 +47,8 @@ h1,h2{font-family:var(--serif);font-weight:400}
 .film-link{min-height:46px}
 .film-link svg{padding:3px;width:24px;height:24px;border:1px solid #ffffff9e;border-radius:50%}
 .hero-bottom{border-top:1px solid #ffffff40;display:flex;justify-content:space-between;align-items:center;gap:14px;min-height:67px;font-size:10px;letter-spacing:.12em}
+.hero-motion{position:absolute;right:var(--gutter);bottom:81px;z-index:4;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffffff80;border-radius:50%;background:#141b1599;color:#fff}
+.hero-motion:hover{background:#141b15}
 .hero-bottom a{display:grid;place-items:center;width:37px;height:37px;border:1px solid #ffffff70;border-radius:50%}
 .collection,.films{padding-block:clamp(65px,9vw,145px)}
 .section-intro{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:clamp(28px,4vw,56px)}
@@ -110,7 +115,7 @@ h2{font-size:clamp(45px,6.2vw,94px);line-height:.98;letter-spacing:-.055em;margi
 }
 @media(max-width:580px){
  .hero{min-height:max(680px,100svh)}
- .hero-image{object-position:57% center}
+ .hero-image,.hero-video{object-position:57% center}
  .hero-bottom span:last-child{display:none}
  .hero-actions{gap:12px 18px}
  .hero h1{font-size:clamp(62px,15vw,87px)}
